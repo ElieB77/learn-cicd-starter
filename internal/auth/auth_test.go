@@ -19,7 +19,7 @@ func TestGetAPIKey(t *testing.T) {
 
 	// Test case: Missing Authorization Header
 	headers = http.Header{}
-	got, err = GetAPIKey(headers)
+	_, err = GetAPIKey(headers)
 	if err == nil || err != ErrNoAuthHeaderIncluded {
 		t.Fatalf("expected error: %v, got: %v", ErrNoAuthHeaderIncluded, err)
 	}
@@ -28,7 +28,7 @@ func TestGetAPIKey(t *testing.T) {
 	headers = http.Header{
 		"Authorization": []string{"Bearer my-secret-key"},
 	}
-	got, err = GetAPIKey(headers)
+	_, err = GetAPIKey(headers)
 	wantErr := errors.New("malformed authorization header")
 	if err == nil || err.Error() != wantErr.Error() {
 		t.Fatalf("expected error: %v, got: %v", wantErr, err)
@@ -38,7 +38,7 @@ func TestGetAPIKey(t *testing.T) {
 	headers = http.Header{
 		"Authorization": []string{"ApiKey"},
 	}
-	got, err = GetAPIKey(headers)
+	_, err = GetAPIKey(headers)
 	if err == nil || err.Error() != wantErr.Error() {
 		t.Fatalf("expected error: %v, got: %v", wantErr, err)
 	}
