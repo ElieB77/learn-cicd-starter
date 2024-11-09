@@ -1,3 +1,5 @@
 #!/bin/bash
 
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o notely
+GOARCH=arm64 GOOS=linux go build -o notely
+
+
