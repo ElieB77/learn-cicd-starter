@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -32,12 +31,8 @@ func main() {
 		log.Printf("warning: assuming default configuration. .env unreadable: %v", err)
 	}
 
-	// Get PORT environment variable (set by Cloud Run or local .env)
-	port := os.Getenv("PORT")
-	if port == "" {
-		// Default to 8080 if PORT is not set, which is the default for Cloud Run
-		port = "8080"
-	}
+	// Hardcoded PORT to 8080
+	port := "8080"
 
 	apiCfg := apiConfig{}
 
@@ -98,7 +93,7 @@ func main() {
 
 	// Create and start the server
 	srv := &http.Server{
-		Addr:              ":" + port, // Bind to the correct port
+		Addr:              ":" + port, // Bind to the hardcoded port 8080
 		Handler:           router,
 		ReadHeaderTimeout: 10 * time.Second,
 	}
