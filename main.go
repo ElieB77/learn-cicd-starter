@@ -26,20 +26,22 @@ type apiConfig struct {
 var staticFiles embed.FS
 
 func main() {
+	// Load .env file locally (only for local development)
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Printf("warning: assuming default configuration. .env unreadable: %v", err)
 	}
 
+	// Get PORT environment variable (set by Cloud Run or local .env)
 	port := os.Getenv("PORT")
 	if port == "" {
-		log.Fatal("PORT environment variable is not set")
+		// Default to 8080 if PORT is not set, which is the default for Cloud Run
+		port = "8080"
 	}
 
 	apiCfg := apiConfig{}
 
-	// https://github.com/libsql/libsql-client-go/#open-a-connection-to-sqld
-	// libsql://[your-database].turso.io?authToken=[your-auth-token]
+	// Check if DATABASE_URL is set and connect to database
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
 		log.Println("DATABASE_URL environment variable is not set")
@@ -56,6 +58,7 @@ func main() {
 
 	router := chi.NewRouter()
 
+	// Set up CORS middleware
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -65,6 +68,7 @@ func main() {
 		MaxAge:           300,
 	}))
 
+	// Serve static files
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		f, err := staticFiles.Open("static/index.html")
 		if err != nil {
@@ -77,6 +81,7 @@ func main() {
 		}
 	})
 
+	// Define API routes
 	v1Router := chi.NewRouter()
 
 	if apiCfg.DB != nil {
@@ -88,11 +93,14 @@ func main() {
 
 	v1Router.Get("/healthz", handlerReadiness)
 
+	// Mount API routes to the main router
 	router.Mount("/v1", v1Router)
+
+	// Create and start the server
 	srv := &http.Server{
-		Addr:              ":" + port,
+		Addr:              ":" + port, // Bind to the correct port
 		Handler:           router,
-		ReadHeaderTimeout: 10 * time.Second, // Set a reasonable timeout for reading headers
+		ReadHeaderTimeout: 10 * time.Second,
 	}
 
 	log.Printf("Serving on port: %s\n", port)
