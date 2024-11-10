@@ -1,19 +1,18 @@
-# Specify the platform to ensure compatibility with Google Cloud Run
-FROM --platform=linux/amd64 debian:stable-slim
+# Use BuildKit syntax
+# syntax=docker/dockerfile:1
 
-# Update and install necessary packages
+# Use a multi-arch base image
+FROM --platform=$TARGETPLATFORM debian:stable-slim
+
+# Install necessary packages
 RUN apt-get update && apt-get install -y ca-certificates
 
 # Add the notely executable and set correct permissions
-ADD notely /usr/bin/notely
+COPY notely /usr/bin/notely
 RUN chmod +x /usr/bin/notely
 
-# Set the environment variable for the port
-ENV PORT=8080
 
 # Use ENTRYPOINT with CMD for better clarity and flexibility
 ENTRYPOINT ["/usr/bin/notely"]
 CMD []
 
-# Healthcheck to ensure the application is running correctly
-HEALTHCHECK CMD curl -f http://localhost:$PORT/ || exit 1
