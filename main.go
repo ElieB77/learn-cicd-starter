@@ -3,14 +3,14 @@ package main
 import (
 	"database/sql"
 	"embed"
-	"io"
-	"log"
-	"net/http"
-	"time"
-	"os"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
+	"io"
+	"log"
+	"net/http"
+	"os"
+	"time"
 
 	"github.com/bootdotdev/learn-cicd-starter/internal/database"
 
