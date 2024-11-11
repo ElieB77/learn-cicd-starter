@@ -1,18 +1,9 @@
-# Use BuildKit syntax
-# syntax=docker/dockerfile:1
+FROM --platform=linux/amd64 debian:stable-slim
 
-# Use a multi-arch base image
-FROM --platform=$TARGETPLATFORM debian:stable-slim
-
-# Install necessary packages
 RUN apt-get update && apt-get install -y ca-certificates
 
-# Add the notely executable and set correct permissions
-COPY notely /usr/bin/notely
-RUN chmod +x /usr/bin/notely
+ADD notely /usr/bin/notely
 
+ENV PORT=8080
 
-# Use ENTRYPOINT with CMD for better clarity and flexibility
-ENTRYPOINT ["/usr/bin/notely"]
-CMD []
-
+CMD ["notely"]
